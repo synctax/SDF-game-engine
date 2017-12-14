@@ -89,7 +89,6 @@ const float xOffset = -1;
 const float yOffset = -1;
 const float aspect = WIDTH*HEIGHTINV;
 const vec3 ambientLight = vec3(0,0,0);
-uniform int sceneTree[50];
 
 struct sdfNode{
     int nodeType;
@@ -111,34 +110,17 @@ struct Material{
     vec3 color;
     float reflectivity;
     float specular;
-//    bool hasTex;
-//    sampler2D tex;
-//    bool hasBMP;
 };
 
-Material materials[2] = Material[2]( Material(vec3(0.49,0.21176,0.133333),0.0,0.0),
-                                    Material(vec3(0.6784,0.549,0.3647),0.1,0.1));
+Material materials[1] = Material[1](Material(vec3(0.5,0.5,0.5),0.1,0.1));
 
 const int numLights = 2;
 pointLight lights[numLights] = pointLight[numLights](pointLight(vec3(100,100,50), vec3(1,1,1), 1.0),
                                                     pointLight(vec3(-100,100,-50), vec3(1,1,1), 1.0));
 
-vec2 makePath(vec3 p){
-    vec2 path = vec2(fBox(p,vec3(5,0.25,100)),1);
-    p +=vec3(55,0,-95);
-    path = fOpUnion(path,vec2(fBox(p,vec3(50,0.25,5)),1));
-    p += vec3(-50,0,0);
-    pR45(p.xz);
-    path = fOpUnion(path,vec2(fBox(p+vec3(-80,0,3.25),vec3(75,0.25,5)),1));
-    pR45(p.zx);
-    path = fOpUnion(path,vec2(fBox(p+vec3(-118.35,0,-105.83),vec3(10,0.25,5)),1));
-    return path;
-}
-
 vec2 scene(vec3 p){
-    vec2 ground = vec2(p.y,0);
-    vec2 path = makePath(p);
-    return fOpUnion(ground,path);
+    float shape = fSphere(p,vec3(1));
+    return vec2(shape,0);
 }
 
 vec3 getSceneNormal( vec3 pos, vec3 ray, float distance)

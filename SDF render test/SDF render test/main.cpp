@@ -34,10 +34,7 @@ float playerLookSpeed = 1.5;
 double lastTime = glfwGetTime();
 int nbFrames = 0;
 float deltaT = 16.66;
-SDF::sdfNode sphereA = SDF::fSphere(10, 0, false);
-SDF::sdfTree tree(&sphereA);
 
-GLuint textures[2];
 
 
 // Window dimensions
@@ -131,42 +128,6 @@ void updateDeltaT(GLFWwindow* window){
     }
 }
 
-void loadTextures(){
-    int width, height;
-    glGenTextures( 2, textures );
-    // ===================
-    // RED SAND
-    // ===================
-    glBindTexture( GL_TEXTURE_2D, textures[0] );
-    // Set our texture parameters
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    // Set texture filtering
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    // Load, create texture and generate mipmaps
-    unsigned char *image = SOIL_load_image( "/Users/benw/Documents/Projects/SDF\ game\ Engine/SDF\ render\ test/SDF\ render\ test/red_dirt_bmp.jpg", &width, &height, 0, SOIL_LOAD_RGBA );
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image );
-    glGenerateMipmap( GL_TEXTURE_2D );
-    glBindTexture( GL_TEXTURE_2D, 0 );
-    
-    // ===================
-    // RED SAND BMP
-    // ===================
-    glBindTexture( GL_TEXTURE_2D, textures[1] );
-    // Set our texture parameters
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    // Set texture filtering
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    // Load, create texture and generate mipmaps
-    image = SOIL_load_image( "/Users/benw/Documents/Projects/SDF\ game\ Engine/SDF\ render\ test/SDF\ render\ test/red_dirt_bmp.jpg", &width, &height, 0, SOIL_LOAD_RGBA );
-    glTexImage2D( GL_TEXTURE_2D, 1, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image );
-    glGenerateMipmap( GL_TEXTURE_2D );
-    SOIL_free_image_data( image );
-    glBindTexture( GL_TEXTURE_2D, 1);
-}
 
 
 // The MAIN function, from here we start the application and run the game loop
@@ -210,7 +171,7 @@ int main( )
     glViewport( 0, 0, screenWidth, screenHeight );
     
     // Build and compile our shader program
-    Shader ourShader( "/Users/benw/Documents/Projects/SDF\ game\ Engine/SDF\ render\ test/SDF\ render\ test/core.vs", "/Users/benw/Documents/Projects/SDF\ game\ Engine/SDF\ render\ test/SDF\ render\ test/core.frag" );
+    Shader ourShader( "/Users/benw/Documents/Projects/SDF game Engine/SDF-game-engine/SDF render test/SDF render test/core.vs", "/Users/benw/Documents/Projects/SDF game Engine/SDF-game-engine/SDF render test/SDF render test/core.frag" );
     
     // Set up vertex data (and buffer(s)) and attribute pointers
     GLfloat vertices[] =
@@ -251,7 +212,6 @@ int main( )
     
     glBindVertexArray( 0 ); // Unbind VAO
     
-    loadTextures();
     
     glfwSetKeyCallback(window, keyCallback);
     
@@ -275,20 +235,11 @@ int main( )
         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
         glBindVertexArray( 0 );
         
-        glUniform1i( glGetUniformLocation( ourShader.Program, "redSandTex" ), 0 );
-        glUniform1i( glGetUniformLocation( ourShader.Program, "redSandBMP" ), 1 );
-        
-        glActiveTexture(GL_TEXTURE0 + 0);
-        glBindTexture(GL_TEXTURE_2D, textures[0]);
-        glActiveTexture(GL_TEXTURE0 + 1);
-        glBindTexture(GL_TEXTURE_2D, textures[1]);
         
         GLint posLoc = glGetUniformLocation(ourShader.Program, "playerPosition");
         glProgramUniform3f(ourShader.Program, posLoc, playerCam.position.x, playerCam.position.y, playerCam.position.z);
         GLint lookLoc = glGetUniformLocation(ourShader.Program, "playerView");
         glProgramUniform3f(ourShader.Program, lookLoc, playerCam.direction.x, playerCam.direction.y, playerCam.direction.z);
-        GLint sdfLoc = glGetUniformLocation(ourShader.Program, "sceneTree");
-        glProgramUniform1iv(ourShader.Program, sdfLoc, 50, tree.buffer);
         
         // Swap the screen buffers
         glfwSwapBuffers( window );
